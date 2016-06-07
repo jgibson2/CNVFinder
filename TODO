@@ -1,0 +1,21 @@
+***********************
+* TODO AND IDEAS LIST *
+***********************
+
+1. Implement callbacks into thread scheduler -- use function pointers
+
+2. Put kmer array in shared memory, write functions for counting kmers, filtering uniqe kmers
+
+3. Check mmap for concurrent file reading, otherwise read incrementally (fread blocksize) and hand off to other threads. Make sure to only grab up to blockSize bytes at once so as to not read entire file into memory (mmap MUCH better choice (used by jellyfish)
+
+NOTE: Don't forget about counting all kmers, especially those that overhang from the end of one block! Impose buffer limit and put next k blocks into buffer for next scheduled call
+
+NOTE: Use calloc for allocating memory for structs. Don't forget error handling for out of memory errors
+
+NOTE: Cancel all threads on SIGTERM
+
+NOTE: Use pthread_tryjoin_np (Linux only) to check if thread is finished. Alternatively just decrement the numActiveThreads and continually check (this is probably better)
+
+NOTE: Put scheduler in separate thread from data feeder, then attempt to feed threads new data continuously while readaing the file in chunks only after checking for block number limit
+
+CONSIDER: remove m_block_size from THreadScheduler (not needed)
