@@ -75,8 +75,13 @@ int Thread::detach()
 
 
 
-ThreadScheduler::ThreadScheduler(uint16_t num_threads, uint64_t block_size)
+ThreadScheduler::ThreadScheduler(uint16_t num_threads, std::queue<T> init_queue)
 {
     m_thread_limit = num_threads;
-    m_block_size = block size;
+    m_queue = init_queue;
+    m_queue_mutex = PTHREAD_MUTEX_INITIALIZER;
+    m_queue_cond = PTHREAD_COND_INITIALIZER;
+    for(int i = 0; i < m_thread_limit; i++)
+    {
+	
 

@@ -2,20 +2,24 @@
 #define __KMER_RECORD_H__
 
 #include <stdint.h>
+#include <stdlib.h>
 
 struct kmer
 {
-	uint8_t k;
-	uint64_t sequence;
+	uint64_t count;
+	kmer(uint64_t _init_count)
+	{
+		count = _init_count;
+	}
 } 
 
-struct unique_kmer : public kmer
+struct genomic_kmer : public kmer
 {
-	bool isUnique;
+	std::list<uint64_t> positions;
+	genomic_kmer(uint64_t _init_count, uint64_t _init_position) : kmer(_init_count), positions()
+	{
+		positions.push_back(_init_position);
+	}
 }
 
-struct counting_kmer: public kmer
-{
-	uint64_t count;	
-}
 #endif // __KMER_RECORD_H_

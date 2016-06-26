@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 uint64_t hashDNAstringtonum(char* , const uint32_t);
 

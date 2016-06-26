@@ -10,6 +10,8 @@
 
 NOTE: Don't forget about counting all kmers, especially those that overhang from the end of one block! Impose buffer limit and put next k blocks into buffer for next scheduled call
 
+NOTE: Count RC Kmer and add values to get index for counting mers in short reads
+
 NOTE: Use calloc for allocating memory for structs. Don't forget error handling for out of memory errors
 
 NOTE: Cancel all threads on SIGTERM

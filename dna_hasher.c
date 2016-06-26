@@ -1,20 +1,20 @@
 #include <dna_hasher.h>
 
-uint64_t hashDNAstringtonum(char* dna, const uint32_t size)
+uint64_t hashDNAstringtonum(std::string dna)
 {
 	uint64_t result = 0;
-	for(int i =0; i<size; i++)
+	for(std::string::iterator it = dna.begin(); it != dna.end(); ++it)
 	{
 		result = result << 2;
-		if(dna[i] == 'C')
+		if(*it == 'C')
 		{
 			result |= 1;
 		}
-		else if(dna[i] == 'G')
+		else if(*it == 'G')
 		{
 			result |= 2;
 		}
-		else if(dna[i] == 'T')
+		else if(*it == 'T')
 		{
 			result |= 3;
 		}
@@ -23,14 +23,15 @@ uint64_t hashDNAstringtonum(char* dna, const uint32_t size)
 
 }
 
-char* hashDNAnumtostring(uint64_t dna_num, const uint32_t length)
+std::string hashDNAnumtostring(uint64_t dna_num, const uint32_t length)
 {
 	const char lookuptable[4] = {'A','C','G','T'};
-	char* dna = malloc(sizeof(char)*length);
-	for(int i = length-1; i>=0; i--)
+	std::string dna = "";
+	for(uint32_t i = length; i > 0; i--)
 	{
-		dna[i]=lookuptable[dna_num & 0b11];
+		dna.push_back(lookuptable[dna_num & 3])
 		dna_num = dna_num >> 2;
 	}
+	std::reverse(dna.begin(), dna.end());
 	return dna;
 }
