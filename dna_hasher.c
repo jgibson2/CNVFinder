@@ -1,4 +1,4 @@
-#include <dna_hasher.h>
+#include "dna_hasher.h"
 
 uint64_t hashDNAstringtonum(std::string dna)
 {
@@ -6,17 +6,19 @@ uint64_t hashDNAstringtonum(std::string dna)
 	for(std::string::iterator it = dna.begin(); it != dna.end(); ++it)
 	{
 		result = result << 2;
-		if(*it == 'C')
+		switch(*it)
 		{
-			result |= 1;
-		}
-		else if(*it == 'G')
-		{
-			result |= 2;
-		}
-		else if(*it == 'T')
-		{
-			result |= 3;
+			case 'C':
+				result |= 1;
+				break;
+			case 'G':
+				result |= 2;
+				break;
+			case 'T':
+				result |= 3;
+				break;
+			default:
+				break;
 		}
 	}
 	return result;
@@ -29,9 +31,32 @@ std::string hashDNAnumtostring(uint64_t dna_num, const uint32_t length)
 	std::string dna = "";
 	for(uint32_t i = length; i > 0; i--)
 	{
-		dna.push_back(lookuptable[dna_num & 3])
+		dna.push_back(lookuptable[dna_num & 3]);
 		dna_num = dna_num >> 2;
 	}
+	std::reverse(dna.begin(), dna.end());
+	return dna;
+}
+
+std::string dnaReverseComplement(std::string dna)
+{
+	auto lambda = [](const char c)
+	{
+		switch(c)
+		{
+			case 'A': 
+				return 'T';
+			case 'G':
+				return 'C';
+			case 'C':
+				return 'G';
+			case 'T':
+				return 	'A';
+			default:
+				return 'N'; //gracefully return N for other bases
+		}
+	};
+	std::transform(dna.cbegin(), dna.cend(), dna.begin(), lambda);
 	std::reverse(dna.begin(), dna.end());
 	return dna;
 }

@@ -5,48 +5,26 @@
 #include <cassert>
 #include <iostream>
 #include <algorithm>
-uint64_t hashDNAstringtonum(std::string dna)
+#include "dna_hasher.h"
+#include "kmer_record.h"
+#include "kmer_counter.h"
+
+int main(int argc, char **argv)
 {
-	        uint64_t result = 0;
-		        for(std::string::iterator it = dna.begin(); it != dna.end(); ++it)
-				        {
-						                result = result << 2;
-								                if(*it == 'C')
-											                {
-														                        result |= 1;
-																	                }
-										                else if(*it == 'G')
-													                {
-																                        result |= 2;
-																			                }
-												                else if(*it == 'T')
-															                {
-																		                        result |= 3;
-																					                }
-														        }
-			        return result;
-
-}
-
-std::string hashDNAnumtostring(uint64_t dna_num, const uint32_t length)
-{
-	        const char lookuptable[4] = {'A','C','G','T'};
-		        std::string dna;
-			        for(uint32_t i = length; i > 0; i--)
-					        {
-							dna.push_back(lookuptable[dna_num & 3]);
-									                dna_num = dna_num >> 2;
-											        }
-				        std::reverse(dna.begin(),dna.end());
-					return dna;
-}
-
-
-int main(int num_args, char** arg_strings)
-{
-	assert(num_args == 2);
-	int k = atoi(arg_strings[1]);
-	for(long i = 0; i < 1000000; i++)
-		hashDNAstringtonum(hashDNAnumtostring(i,k));
+	std::string dna(argv[1]);
+	std::string dna2(argv[2]);
+	kmer_hash<genomic_kmer> hash((uint16_t)atoi(argv[3]));
+	kmer_sequence_data<genomic_kmer> data(dna, (uint16_t)atoi(argv[3]), &hash);
+	pthread_t thread;
+	pthread_t thread2;
+	kmer_sequence_data<genomic_kmer> data2(dna2, (uint16_t)atoi(argv[3]), &hash);
+	pthread_create(&thread, NULL, count_genomic_kmers, (void*)&data);
+	pthread_create(&thread2, NULL, count_genomic_kmers, (void*)&data2);
+	pthread_join(thread, NULL);
+	pthread_join(thread2, NULL);
+	for (auto kv_pair : hash.hash)
+	{
+		std::cout << kv_pair.first << " " << kv_pair.second.isUnique << std::endl;
+	}
 	return 0;
 }

@@ -3,10 +3,14 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
+#include <algorithm>
 
-uint64_t hashDNAstringtonum(char* , const uint32_t);
+uint64_t hashDNAstringtonum(std::string);
 
-char* hashDNAnumtostring(uint64_t, const uint32_t);
+std::string hashDNAnumtostring(uint64_t, const uint32_t);
+
+std::string dnaReverseComplement(std::string);
+
 
 #endif //__DNA_HASHER_H__
