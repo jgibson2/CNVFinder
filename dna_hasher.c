@@ -8,12 +8,15 @@ uint64_t hashDNAstringtonum(std::string dna)
 		result = result << 2;
 		switch(*it)
 		{
+			case 'c':
 			case 'C':
 				result |= 1;
 				break;
+			case 'g':
 			case 'G':
 				result |= 2;
 				break;
+			case 't':
 			case 'T':
 				result |= 3;
 				break;
@@ -25,11 +28,11 @@ uint64_t hashDNAstringtonum(std::string dna)
 
 }
 
-std::string hashDNAnumtostring(uint64_t dna_num, const uint32_t length)
+std::string hashDNAnumtostring(uint64_t dna_num, const uint8_t length)
 {
 	const char lookuptable[4] = {'A','C','G','T'};
 	std::string dna = "";
-	for(uint32_t i = length; i > 0; i--)
+	for(uint8_t i = length; i > 0; i--)
 	{
 		dna.push_back(lookuptable[dna_num & 3]);
 		dna_num = dna_num >> 2;
@@ -44,12 +47,16 @@ std::string dnaReverseComplement(std::string dna)
 	{
 		switch(c)
 		{
+			case 'a':
 			case 'A': 
 				return 'T';
+			case 'g':
 			case 'G':
 				return 'C';
+			case 'c':
 			case 'C':
 				return 'G';
+			case 't':
 			case 'T':
 				return 	'A';
 			default:

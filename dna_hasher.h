@@ -8,7 +8,7 @@
 
 uint64_t hashDNAstringtonum(std::string);
 
-std::string hashDNAnumtostring(uint64_t, const uint32_t);
+std::string hashDNAnumtostring(uint64_t, const uint8_t);
 
 std::string dnaReverseComplement(std::string);
 
