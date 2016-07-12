@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	std::vector<kmer_hash<genomic_kmer>> hashes(NUM_THREADS, (uint8_t)atoi(argv[2]));
 	kmer_hash<genomic_kmer> master_hash((uint8_t)atoi(argv[2]));
 	uint64_t pos = 0;
-
+	uint8_t k = (uint8_t)atoi(argv[2]);
 	#ifdef DEBUG
 	uint64_t iteration = 0;
 	#endif
@@ -35,7 +35,8 @@ int main(int argc, char **argv)
 		std::vector<kmer_sequence_data<genomic_kmer>> data;
 		for(int d = 0; d < NUM_THREADS; d++)
 		{
-			std::string dna = reader.getRecordBlock(1);
+			std::string dna = reader.getRecordBlock(10000, k);
+			std::cout << dna << std::endl;
 			data.push_back(kmer_sequence_data<genomic_kmer>(dna, (uint8_t)atoi(argv[2]), pos, &hashes[d]));
 			pos += dna.length();
 		}
