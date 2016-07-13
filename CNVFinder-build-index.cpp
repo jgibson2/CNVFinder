@@ -25,10 +25,14 @@ void writeIndexToFile(char* filename, kmer_hash<genomic_kmer> genomic_kmer_hash)
 		for(auto kmer_record : genomic_kmer_hash.hash_map)
 		{
 			if(kmer_record.second.isUnique)
-			{
+			{	
 				uint64_t kmer =  hashDNAstringtonum(kmer_record.first);
 				index_file.write(reinterpret_cast<const char*>(&kmer), sizeof(kmer));
 				index_file.write(reinterpret_cast<const char*>(&kmer_record.second.firstPosition), sizeof(kmer_record.second.firstPosition));
+
+				//DEBUG
+				//std::cout << kmer_record.first << "\t" << kmer_record.second.firstPosition << "\n";
+
 			}
 		}
 		index_file.close();
@@ -187,7 +191,7 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	if(!record_block_size){err &= 1;}
+	if(record_block_size==0){err &= 1;}
 	if(strcmp(genome_filename,"")==0){err &= 2;}
        	if(strcmp(output_filename,"") ==0){err &= 4;}
 	if(!k){err &= 8;}

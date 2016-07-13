@@ -21,3 +21,5 @@ NOTE: Use pthread_tryjoin_np (Linux only) to check if thread is finished. Altern
 NOTE: Put scheduler in separate thread from data feeder, then attempt to feed threads new data continuously while readaing the file in chunks only after checking for block number limit
 
 CONSIDER: remove m_block_size from THreadScheduler (not needed)
+
+remove any sequences with N's from the hash

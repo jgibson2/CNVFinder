@@ -17,5 +17,6 @@ class SequenceFileReader
 		SequenceFileReader(char*);
 		std::string getRecordBlock(uint64_t, uint8_t);
 		std::string getRecords(uint32_t);
+		std::string getBuffer();
 		bool atEnd();
 };

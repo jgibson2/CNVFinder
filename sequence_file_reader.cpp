@@ -55,7 +55,7 @@ std::string SequenceFileReader::getRecordBlock(uint64_t max_bytes, uint8_t overh
 	{
 
 		result = buf.substr(0,max_bytes);
-		buf.erase(0,max_bytes-overhang); //take up to max_bytes off the front (now back because of reversal)  of the string
+		buf.erase(0,max_bytes-overhang); //take up to max_bytes - overhang off the front  of the string
 	}
 	catch(std::out_of_range& err)
 	{
@@ -63,7 +63,12 @@ std::string SequenceFileReader::getRecordBlock(uint64_t max_bytes, uint8_t overh
 	}
 	return result;
 }
+std::string SequenceFileReader::getBuffer()
+{
+	return buf;
+}
+
 bool SequenceFileReader::atEnd()
 {
-	return seqan::atEnd(fileReader);
+	return seqan::atEnd(fileReader)&buf.empty();
 }

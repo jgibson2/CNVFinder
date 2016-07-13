@@ -38,7 +38,7 @@ IndexFileData readIndexFile(char* filename)
 			uint64_t kmer, location;
 			index_file.read(reinterpret_cast<char*>(&kmer), 8);
 			index_file.read(reinterpret_cast<char*>(&location), 8);
-			uniques_hash.hash_map.emplace(hashDNAnumtostring(kmer,k), read_kmer(location, 0));	
+			uniques_hash.hash_map.emplace(hashDNAnumtostring(kmer,k), read_kmer(location, 0));
 		}
 		index_file.close();
 		IndexFileData filedata(k,uniques_hash);
@@ -135,6 +135,23 @@ void printHelp()
 	std::cerr << help << std::endl;
 }
 
+void writeCountsFile(char* filename, kmer_hash<read_kmer> uniques_hash_counted)
+{
+	try
+	{
+		std::ofstream outfile(filename, std::ios::out);
+		outfile << "Kmer\tPos\tCount\n";
+		for(auto kmer_rec : uniques_hash_counted.hash_map)
+		{
+			outfile << kmer_rec.first << "\t" << kmer_rec.second.firstPosition << "\t" << kmer_rec.second.count << "\n";
+		}
+	}
+	catch(std::ios_base::failure& e)
+	{
+		std::cerr << "Could not write to file " << filename << ". " << std::endl;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	int err = 0;
@@ -205,7 +222,7 @@ int main(int argc, char **argv)
 	}
 	
 	IndexFileData idxfiledata = readIndexFile(index_filename);
-	countUniqueKmersInReads(reads_filename, idxfiledata.k, num_threads, idxfiledata.uniques_hash, records);
+	writeCountsFile(output_filename, countUniqueKmersInReads(reads_filename, idxfiledata.k, num_threads, idxfiledata.uniques_hash, records));
 
 	return 0;
 }
