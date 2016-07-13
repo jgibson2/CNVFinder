@@ -6,20 +6,25 @@
 
 struct kmer
 {
-	uint64_t count;
-	kmer(uint64_t _init_count)
+	uint64_t firstPosition;
+	kmer(uint64_t _init_position) : firstPosition(_init_position)
 	{
-		count = _init_count;
 	}
-}; 
+};
 
 struct genomic_kmer : public kmer
 {
 	bool isUnique = true;
-	uint64_t firstPosition;
-	genomic_kmer(uint64_t _init_count, uint64_t _init_position) : kmer(_init_count)
+	genomic_kmer(uint64_t _init_position) : kmer(_init_position)
 	{
-		firstPosition = _init_position;
+	}
+};
+
+struct read_kmer : public kmer
+{
+	uint64_t count;
+	read_kmer(uint64_t _init_position, uint64_t _init_count): kmer(_init_position),count(_init_count)
+	{
 	}
 };
 

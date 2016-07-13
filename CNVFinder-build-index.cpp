@@ -6,7 +6,7 @@
 #include <fstream>
 
 #define PTHREAD_STACK_SIZE 300000000
-
+#define MAX_PATH_LENGTH 300
 
 #define DEBUG
 
@@ -31,6 +31,7 @@ void writeIndexToFile(char* filename, kmer_hash<genomic_kmer> genomic_kmer_hash)
 				index_file.write(reinterpret_cast<const char*>(&kmer_record.second.firstPosition), sizeof(kmer_record.second.firstPosition));
 			}
 		}
+		index_file.close();
 
 	}
 	catch(std::ios_base::failure& e)
@@ -45,7 +46,7 @@ kmer_hash<genomic_kmer> buildUniqueGenomicKmerHash(char* filename, uint8_t k, ui
 	 * Function: build hash of unique genomic k-mers
 	 * Args: filename: file name to read FASTA genome file from; k: length of k-mer; num_threads: number of threads to run counter with
 	 * Notes:
-	 * 	Genomic file should contain either contigs or chromosomes; reader reads in by record. Maybe change this to split large records into fixed blocks? K-mer lengths of up to 32 are supported; after this they are frankly not useful, as mostly everything is unique.
+	 * 	Genomic file should contain either contigs or chromosomes; reader reads in by record. K-mer lengths of up to 32 are supported; after this they are frankly not useful, as mostly everything is unique.
 	 */
 	SequenceFileReader reader(filename);
 	std::vector<kmer_hash<genomic_kmer>> thread_hashes(num_threads, k);
@@ -67,11 +68,11 @@ kmer_hash<genomic_kmer> buildUniqueGenomicKmerHash(char* filename, uint8_t k, ui
 		std::vector<pthread_t> threads(num_threads);
 		for(uint16_t i = 0; i < num_threads; i++)
 		{
-			std::string dna = reader.getRecordBlock(record_block_size);
+			std::string dna = reader.getRecordBlock(record_block_size,k);
 			pthread_mutex_lock(&(data[i].hash->hash_mutex));
 			data[i].sequence = dna;
 			data[i].start_coordinate = coordinate;
-			pthread_create(&(threads[i]), &attr, count_genomic_kmers, (void*)&data[i]);
+			pthread_create(&(threads[i]), &attr, count_genomic_kmers, static_cast<void*>(&data[i]));
 			pthread_mutex_unlock(&(data[i].hash->hash_mutex));
 			coordinate += dna.length();
 		}
@@ -107,13 +108,6 @@ kmer_hash<genomic_kmer> buildUniqueGenomicKmerHash(char* filename, uint8_t k, ui
 	#ifdef DEBUG
 	std::cerr << "Finished combining hashes..." << std::endl;
 	#endif
-
-	#ifdef DEBUG
-		for(auto kv_pair : master_hash.hash_map)
-		{
-			//std::cout << kv_pair.first <<  " " << kv_pair.second.isUnique << " " << kv_pair.second.firstPosition << std::endl;
-		}	
-	#endif
 	
 	return master_hash;
 }
@@ -129,7 +123,7 @@ void printHelp()
 	 * 		-g <path/to/file> : genome FASTA file\n\
 	 * 		-o <path/to/file> : output file\n\
 	 * 		-h : help\n\
-	 * 		-r <uint32> : number of FASTA records to get at once (default 1)\n\
+	 * 		-r <uint32> : number of bytes from FASTA records to get at once (default 10000)\n\
 	 * 		-c <uint64> : starting coordinate (default 0)\n\
 	 * Notes:\n\
 	 * 	This program must be run to build the index before the anaylsis can be performed\n\
@@ -142,9 +136,9 @@ int main(int argc, char **argv)
 	int err = 0;
 	uint8_t k = 0;
 	uint16_t num_threads = 1;
-	char* genome_filename;
-	char* output_filename;
-	uint32_t record_block_size = 1;
+	char genome_filename[MAX_PATH_LENGTH]="";
+	char output_filename[MAX_PATH_LENGTH]="";
+	uint32_t record_block_size = 10000;
 	uint64_t start_coord = 0;
 	/*
 	 * Function: main function to run unique genomic kmer index builder
@@ -155,7 +149,7 @@ int main(int argc, char **argv)
 	 * 		-g <path/to/file> : genome FASTA file
 	 * 		-o <path/to/file> : output file
 	 * 		-h : help
-	 * 		-r <uint32> : number of FASTA records to get at once (default 1)
+	 * 		-r <uint32> : number of bytes from FASTA records to get at once (default 10000)
 	 * 		-c <uint64> : starting coordinate (default 0)
 	 * Notes:
 	 * 	This program must be run to build the index before the anaylsis can be performed
@@ -168,11 +162,11 @@ int main(int argc, char **argv)
 		}	
 		if(strcmp(argv[i], "-g")==0)
 		{
-			genome_filename = argv[i+1];
+			strcpy(genome_filename, argv[i+1]);
 		}
 		if(strcmp(argv[i], "-o")==0)
 		{
-			output_filename = argv[i+1];
+			strcpy(output_filename, argv[i+1]);
 		}
 		if(strcmp(argv[i], "-h")==0)
 		{

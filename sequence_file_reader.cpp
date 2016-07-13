@@ -34,7 +34,6 @@ std::string SequenceFileReader::getRecords(uint32_t num_records)
 	seqan::clear(ids);
 	return rec_block;
 }
-
 std::string SequenceFileReader::getRecordBlock(uint64_t max_bytes, uint8_t overhang)
 {
 	std::string result;
@@ -54,16 +53,16 @@ std::string SequenceFileReader::getRecordBlock(uint64_t max_bytes, uint8_t overh
 	}
 	try
 	{
-		result = buf.substr(0,max_bytes); //take up to max_bytes off the front of the string
-		buf = buf.substr(result.length()-overhang-1, buf.npos); //get the rest of the string, with a k bp overlap
+
+		result = buf.substr(0,max_bytes);
+		buf.erase(0,max_bytes-overhang); //take up to max_bytes off the front (now back because of reversal)  of the string
 	}
 	catch(std::out_of_range& err)
 	{
-		buf.clear(); // if the original buf string was shorter than the overlap, then empty buf
+		buf.clear(); // just in case the string magically becomes empty
 	}
 	return result;
 }
-
 bool SequenceFileReader::atEnd()
 {
 	return seqan::atEnd(fileReader);
